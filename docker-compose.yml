@@ -28,8 +28,7 @@ networks:
       driver: default
       config:
         - subnet: 172.50.0.0/24  # Set your desired subnet for vpnnetwork
-        # docker network create --subnet=172.50.0.0/24 vpnnetwork #
-        # If you change this, you will need to update the static IPs set for each service/container
+        # docker network create --subnet=172.50.0.0/24 vpnnetwork
 
 #########################
 ###### Services #########
@@ -83,10 +82,11 @@ services:
       interval: 20s
       timeout: 3s
       retries: 3
-      start_period: 25s
+      start_period: 30s
     networks:
       vpnnetwork:
         ipv4_address: 172.50.0.2
+#    command: sh -c curl -s ifconfig.me
     restart: always
 
   #########################
@@ -143,13 +143,7 @@ services:
      ### Commented out for now - As it needs more testing
     ports:
       - 8096:8096 # Emby
-      - 8920:8920 # Emby
-#    healthcheck:
-#      test: wget --no-verbose --tries=3 --spider http://127.0.0.1:8096 || exit 1
-#      interval: 1m
-#      retries: 5
-#      start_period: 3m
-#      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://192.168.0.153:8096/?staticview=true#/SessionsService"]
+      - 8920:8920 # Emby	 
     depends_on:
       vpn:
         condition: service_healthy
@@ -183,8 +177,8 @@ services:
         condition: service_healthy
     networks:
       vpnnetwork:
-        ipv4_address: 172.50.0.4
-    restart: unless-stopped
+        ipv4_address: 172.50.0.4		
+    restart: unless-stopped	
 
   #########################
   ######## Sonarr #########
@@ -210,7 +204,7 @@ services:
       - 8999:8999 # Sonarr
     networks:
       vpnnetwork:
-        ipv4_address: 172.50.0.5
+        ipv4_address: 172.50.0.5	  
     restart: always
 
   #########################
@@ -237,7 +231,7 @@ services:
       - 7878:7878 # Radarr
     networks:
       vpnnetwork:
-        ipv4_address: 172.50.0.6
+        ipv4_address: 172.50.0.6	  
     restart: always
 
   #########################
@@ -284,8 +278,6 @@ services:
       - ./:/config
       - /${DOWNLOAD_TORRENTS}:/data
     healthcheck:
-      # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
-      # see: https://github.com/qdm12/gluetun/issues/641#issuecomment-933856220
       test: [ "CMD", "curl", "-f", "http://127.0.0.1:${QBIT_WEBUI_PORT}", "https://google.com" ]
       interval: 30s
       timeout: 5s
@@ -294,7 +286,7 @@ services:
     depends_on:
       vpn:
         condition: service_healthy
-    network_mode: service:vpn
+    network_mode: service:vpn		
     restart: always
 
   #########################
@@ -303,7 +295,7 @@ services:
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
-    container_name: sabnzb
+    container_name: sabnzb  
     volumes:
       - ./sabnzbd:/config
       - /${DOWNLOAD_USENET}:/data
@@ -320,7 +312,7 @@ services:
     depends_on:
       vpn:
         condition: service_healthy
-    network_mode: service:vpn
+    network_mode: service:vpn		
     restart: unless-stopped
 
   #########################
@@ -362,7 +354,7 @@ services:
       - UN_MAX_RETRIES=3
       - UN_PARALLEL=1
       - UN_FILE_MODE=0644
-      - UN_DIR_MODE=0755
+      - UN_DIR_MODE=0755	  
       # Sonarr Config
       - UN_SONARR_0_URL=${SONARR_URL}
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
@@ -370,7 +362,7 @@ services:
       - UN_SONARR_0_PROTOCOLS=torrent
       - UN_SONARR_0_TIMEOUT=10s
       - UN_SONARR_0_DELETE_ORIG=false
-      - UN_SONARR_0_DELETE_DELAY=5m
+      - UN_SONARR_0_DELETE_DELAY=5m	  
       # Radarr Config
       - UN_RADARR_0_URL=${RADARR_URL}
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
@@ -403,7 +395,7 @@ services:
       - UN_WEBSERVER_SSL_CERT_FILE=
       - UN_WEBSERVER_SSL_KEY_FILE=
       - UN_WEBSERVER_URLBASE=/
-      - UN_WEBSERVER_UPSTREAMS=
+      - UN_WEBSERVER_UPSTREAMS=	  
     security_opt:
       - no-new-privileges:true
     restart: always
