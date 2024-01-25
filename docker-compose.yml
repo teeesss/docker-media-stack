@@ -12,6 +12,7 @@ version: '3.9'
 # Sonarr        172.50.0.5
 # Radarr        172.50.0.6
 # Prowlarr      172.50.0.7
+# Unpackerr		172.50.0.8
 # Flaresolverr  172.50.0.10
 # Portainer     172.50.0.30
 # WG-Easy       172.50.0.100
@@ -86,7 +87,6 @@ services:
     networks:
       vpnnetwork:
         ipv4_address: 172.50.0.2
-#    command: sh -c curl -s ifconfig.me
     restart: always
 
   #########################
@@ -140,7 +140,6 @@ services:
     volumes:
       - ./emby:/config
       - /${MEDIA}:/data/media
-     ### Commented out for now - As it needs more testing
     ports:
       - 8096:8096 # Emby
       - 8920:8920 # Emby	 
@@ -159,6 +158,10 @@ services:
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
+    user: ${USER_ID}:${GROUP_ID}	
+    dns:
+      - 9.9.9.9
+      - 1.1.1.1
     environment:
       - LOG_LEVEL=debug
       - TZ=${TIMEZONE}
@@ -295,7 +298,7 @@ services:
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
-    container_name: sabnzb  
+    container_name: sabnzb
     volumes:
       - ./sabnzbd:/config
       - /${DOWNLOAD_USENET}:/data
@@ -339,9 +342,9 @@ services:
   unpackerr:
     image: golift/unpackerr:latest
     container_name: unpackerr
+    user: ${USER_ID}:${GROUP_ID}	
     volumes:
       - ${DOWNLOAD_ARR}:/data/
-    user: ${USER_ID}:${GROUP_ID}
     environment:
       - TZ=${TIMEZONE}
       # General config
@@ -378,16 +381,8 @@ services:
       - UN_FOLDER_0_DELETE_ORIGINAL=false
       - UN_FOLDER_0_DELETE_FILES=false
       - UN_FOLDER_0_MOVE_BACK=false
-      # Command Hook Config
-      - UN_CMDHOOK_0_COMMAND=
-      - UN_CMDHOOK_0_NAME=
-      - UN_CMDHOOK_0_TIMEOUT=10s
-      - UN_CMDHOOK_0_SILENT=false
-      - UN_CMDHOOK_0_SHELL=false
-      - UN_CMDHOOK_0_EXCLUDE_0=
-      - UN_CMDHOOK_0_EVENTS_0=0
       # Web Server Config
-      - UN_WEBSERVER_METRICS=false
+      - UN_WEBSERVER_METRICS=true
       - UN_WEBSERVER_LISTEN_ADDR=0.0.0.0:5656
       - UN_WEBSERVER_LOG_FILE=
       - UN_WEBSERVER_LOG_FILES=10
@@ -398,6 +393,11 @@ services:
       - UN_WEBSERVER_UPSTREAMS=	  
     security_opt:
       - no-new-privileges:true
+    ports:
+      - 5656:5656 # Unpackerr
+    networks:
+      vpnnetwork:
+        ipv4_address: 172.50.0.8
     restart: always
 
   #########################
@@ -410,19 +410,6 @@ services:
     environment:
       - WATCHTOWER_CLEANUP=true
       - health-check
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: always
-
-  #########################
-  ####### Autoheal ########
-  #########################
-
-  autoheal:
-    image: willfarrell/autoheal:latest
-    container_name: autoheal
-    environment:
-      - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
