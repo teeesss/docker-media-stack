@@ -344,6 +344,7 @@ services:
     container_name: unpackerr
     user: ${USER_ID}:${GROUP_ID}	
     volumes:
+      - ./unpackerr:/config
       - ${DOWNLOAD_ARR}:/data/
     environment:
       - TZ=${TIMEZONE}
@@ -361,16 +362,16 @@ services:
       # Sonarr Config
       - UN_SONARR_0_URL=${SONARR_URL}
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
-      - UN_SONARR_0_PATHS_0=/data
-      - UN_SONARR_0_PROTOCOLS=torrent
+      - UN_SONARR_0_PATHS_0=/data/downloads/sonarr-tv
+      - UN_SONARR_0_PROTOCOLS=torrent,usenet
       - UN_SONARR_0_TIMEOUT=10s
       - UN_SONARR_0_DELETE_ORIG=false
       - UN_SONARR_0_DELETE_DELAY=5m	  
       # Radarr Config
       - UN_RADARR_0_URL=${RADARR_URL}
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
-      - UN_RADARR_0_PATHS_0=/data
-      - UN_RADARR_0_PROTOCOLS=torrent
+      - UN_RADARR_0_PATHS_0=/data/downloads/radarr-movies
+      - UN_RADARR_0_PROTOCOLS=torrent,usenet
       - UN_RADARR_0_TIMEOUT=10s
       - UN_RADARR_0_DELETE_ORIG=false
       - UN_RADARR_0_DELETE_DELAY=5m
