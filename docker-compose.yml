@@ -12,7 +12,7 @@ version: '3.9'
 # Sonarr        172.50.0.5
 # Radarr        172.50.0.6
 # Prowlarr      172.50.0.7
-# Unpackerr		172.50.0.8
+# Unpackerr     172.50.0.8
 # Flaresolverr  172.50.0.10
 # Portainer     172.50.0.30
 # WG-Easy       172.50.0.100
